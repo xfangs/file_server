@@ -8,5 +8,9 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
     default-property-inclusion: non_null
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
 server:
   port: 8081
