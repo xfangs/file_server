@@ -2,6 +2,7 @@ package com.zhongli.fileserver.config;
 
 import com.zhongli.devplatform.vo.ConfigVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
@@ -20,9 +21,13 @@ public class MyWebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private RequestMappingHandlerAdapter handlerAdapter;
 
+
+    @Value("${dev-platform.cache-name}")
+    private String cacheName;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String baseDir = cacheManager.getCache("dev_platform_system_parameter").get("file:baseDir", String::new);
+        String baseDir = cacheManager.getCache(cacheName + "_system_parameter").get("file:baseDir", String::new);
         if (StringUtils.isEmpty(baseDir)) {
             throw new RuntimeException("没有从缓存中获取到系统配置信息,请先启动业务平台");
         }
