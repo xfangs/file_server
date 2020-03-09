@@ -1,12 +1,10 @@
 package com.zhongli.fileserver.controller;
 
-import com.zhongli.devplatform.vo.ConfigVO;
 import com.zhongli.devplatform.vo.Res;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,17 +19,21 @@ import java.util.UUID;
 @Slf4j
 public class FileController {
 
-    @Autowired
-    private CacheManager cacheManager;
+
+    @Value("${dev-platform.file-dir}")
+    private String baseDir;
+
 
     @PostMapping("/upload")
     public Res upload(@RequestParam("file") MultipartFile multipartFile, String folder) {
 
         try {
-            String baseDir = cacheManager.getCache("dev_platform_system_parameter").get("file:baseDir", String::new);
             File folderFile = new File(baseDir + folder);
             if (!folderFile.exists()) {
-                folderFile.mkdir();
+                boolean mkdir = folderFile.mkdir();
+                if (!mkdir) {
+                    log.error("创建文件夹失败");
+                }
             }
             String fileName = multipartFile.getOriginalFilename();
             //修改文件名称 uuid
@@ -54,7 +56,6 @@ public class FileController {
     @RequestMapping("/getVideoDuration")
     public Res getVideoDuration(String file, String folder) {
         try {
-            String baseDir = cacheManager.getCache("dev_platform_system_parameter").get("file:baseDir", String::new);
             File videoFile = new File(baseDir + folder + "/" + file);
             FFmpegFrameGrabber ff = new FFmpegFrameGrabber(videoFile);
             ff.start();

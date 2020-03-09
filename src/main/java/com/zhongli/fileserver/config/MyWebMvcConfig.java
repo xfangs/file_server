@@ -1,11 +1,8 @@
 package com.zhongli.fileserver.config;
 
-import com.zhongli.devplatform.vo.ConfigVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -14,23 +11,13 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @Configuration
 public class MyWebMvcConfig implements WebMvcConfigurer {
 
-
-    @Autowired
-    private CacheManager cacheManager;
-
+    @Value("${dev-platform.file-dir}")
+    private String baseDir;
     @Autowired
     private RequestMappingHandlerAdapter handlerAdapter;
 
-
-    @Value("${dev-platform.cache-name}")
-    private String cacheName;
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String baseDir = cacheManager.getCache(cacheName + "_system_parameter").get("file:baseDir", String::new);
-        if (StringUtils.isEmpty(baseDir)) {
-            throw new RuntimeException("没有从缓存中获取到系统配置信息,请先启动业务平台");
-        }
         registry.addResourceHandler("/file/**").addResourceLocations("file:" + baseDir + "/");
     }
 
