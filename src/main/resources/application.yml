@@ -7,8 +7,10 @@ spring:
     multipart:
       max-file-size: 2048MB
       max-request-size: 2048MB
+  jmx:
+    enabled: false
 server:
-  port: 8082
+  port: 8081
 dev-platform:
   file-dir: D:\baseDir
 
